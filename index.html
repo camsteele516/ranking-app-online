@@ -25,6 +25,12 @@
   <button onclick="joinGame()">Join Game</button>
 </div>
 
+<div id="listInputScreen" class="hidden">
+  <h3>Enter items to rank (one per line):</h3>
+  <textarea id="itemInputBox" rows="8" style="width: 100%;"></textarea><br/>
+  <button onclick="submitItemList()">Submit List</button>
+</div>
+  
 <div id="rankingScreen" class="hidden">
   <h3>Drag to Rank:</h3>
   <div class="list-container" id="rankingList"></div>
@@ -70,11 +76,12 @@ const firebaseConfig = {
     listRef.once("value").then(snapshot => {
       let items = snapshot.val();
       if (!items) {
-        // First player creates list
-        items = prompt("Enter items to rank (one per line):").split("\n").map(i => i.trim()).filter(Boolean);
-        listRef.set(items);
+  // Show item input screen for the first player
+        document.getElementById("startScreen").classList.add("hidden");
+        document.getElementById("listInputScreen").classList.remove("hidden");
+      } else {
+        startRanking(items); // other players can rank right away
       }
-      startRanking(items);
     });
   }
 
@@ -147,6 +154,17 @@ const firebaseConfig = {
       ? results.join("\n")
       : "No matching ranks.";
   }
+  function submitItemList() {
+  const rawInput = document.getElementById("itemInputBox").value;
+  const items = rawInput.split("\n").map(line => line.trim()).filter(Boolean);
+  if (items.length < 2) return alert("Enter at least two items.");
+
+  const listRef = db.ref("games/" + gameId + "/items");
+  listRef.set(items).then(() => {
+    document.getElementById("listInputScreen").classList.add("hidden");
+    startRanking(items);
+  });
+}
 </script>
 
 </body>
