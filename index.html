@@ -40,7 +40,20 @@
 <div id="resultScreen" class="hidden">
   <h3>Matching Ranks:</h3>
   <pre id="resultText"></pre>
+
+  <h3>Full Rankings:</h3>
+  <div style="display: flex; gap: 40px;">
+    <div>
+      <h4 id="player1Name"></h4>
+      <ol id="player1List"></ol>
+    </div>
+    <div>
+      <h4 id="player2Name"></h4>
+      <ol id="player2List"></ol>
+    </div>
+  </div>
 </div>
+
 
 <script>
   let gameId, playerName;
