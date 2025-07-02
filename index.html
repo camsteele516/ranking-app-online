@@ -157,16 +157,28 @@ const firebaseConfig = {
   }
 
   function showResults(list1, list2) {
-    document.getElementById("rankingScreen").classList.add("hidden");
-    document.getElementById("resultScreen").classList.remove("hidden");
+  document.getElementById("rankingScreen").classList.add("hidden");
+  document.getElementById("resultScreen").classList.remove("hidden");
 
-    const results = list1.filter((item, index) => list2[index] === item)
-                         .map((item, i) => `- ${item} (Rank ${i + 1})`);
+  const results = list1.filter((item, index) => list2[index] === item)
+                       .map((item, i) => `- ${item} (Rank ${i + 1})`);
 
-    document.getElementById("resultText").textContent = results.length
-      ? results.join("\n")
-      : "No matching ranks.";
-  }
+  document.getElementById("resultText").textContent = results.length
+    ? results.join("\n")
+    : "No matching ranks.";
+
+  // Get player names
+  const rankingsRef = db.ref(`games/${gameId}/rankings`);
+  rankingsRef.once("value").then(snapshot => {
+    const all = snapshot.val();
+    const [p1, p2] = Object.keys(all);
+    document.getElementById("player1Name").textContent = p1;
+    document.getElementById("player2Name").textContent = p2;
+
+    renderList("player1List", all[p1]);
+    renderList("player2List", all[p2]);
+  });
+}
   function submitItemList() {
   const rawInput = document.getElementById("itemInputBox").value;
   const items = rawInput.split("\n").map(line => line.trim()).filter(Boolean);
@@ -176,6 +188,15 @@ const firebaseConfig = {
   listRef.set(items).then(() => {
     document.getElementById("listInputScreen").classList.add("hidden");
     startRanking(items);
+  });
+}
+  function renderList(containerId, items) {
+  const container = document.getElementById(containerId);
+  container.innerHTML = "";
+  items.forEach(item => {
+    const li = document.createElement("li");
+    li.textContent = item;
+    container.appendChild(li);
   });
 }
 </script>
